@@ -8,20 +8,21 @@ const GUESTS_API_URL =
 const RSVPS_API_URL = "http://fsa-async-await.herokuapp.com/api/workshop/rsvps";
 const GIFTS_API_URL = "http://fsa-async-await.herokuapp.com/api/workshop/gifts";
 
+let partiesList = [];
+
 // get all parties
 const getAllParties = async () => {
   try {
     const res = await fetch(PARTIES_API_URL);
     //! ---- API Block Test
-      if (res.ok) {
-          console.log("getAllParties Function: SUCCESS");
-        } else {
-          console.log("getAllParties Function: NOT-SUCCESSFUL");
-        }
+    if (res.ok) {
+      console.log("getAllParties Function: SUCCESS");
+    } else {
+      console.log("getAllParties Function: NOT-SUCCESSFUL");
+    }
     const getAllPartiesjson = await res.json();
     return getAllPartiesjson;
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
   }
 };
@@ -32,12 +33,12 @@ console.log(await getAllParties());
 const getPartyById = async (id) => {
   try {
     const res = await fetch(`${PARTIES_API_URL}/${id}`);
-      //! ---- API Block Test
-      if (res.ok) {
-          console.log("getPartyById Function: SUCCESS");
-        } else {
-          console.log("getPartyById Function: NOT-SUCCESSFUL");
-        }
+    //! ---- API Block Test
+    if (res.ok) {
+      console.log("getPartyById Function: SUCCESS");
+    } else {
+      console.log("getPartyById Function: NOT-SUCCESSFUL");
+    }
     const getPartyByIdjson = await res.json();
     return getPartyByIdjson;
   }
@@ -56,12 +57,12 @@ const deleteParty = async (id) => {
       },
       body: JSON.stringify(),
     });
-      //! ---- API Block Test
-      if (res.ok) {
-          console.log("getPartyById Function: SUCCESS");
-        } else {
-          console.log("getPartyById Function: NOT-SUCCESSFUL");
-        }
+    //! ---- API Block Test
+    if (res.ok) {
+      console.log("getPartyById > deleteParty Function: SUCCESS");
+    } else {
+      console.log("getPartyById > deleteParty Function: NOT-SUCCESSFUL");
+    }
     const deletePartyjson = res.json();
     return deletePartyjson;
   }
@@ -73,58 +74,54 @@ const deleteParty = async (id) => {
 // render a single party by id
 const renderSinglePartyById = async (id) => {
   try {
-    // fetch party details from server
+    partyContainer.innerHTML = '';
+    //* fetch party details from server
     const party = await getPartyById(id);
 
-    // GET - /api/workshop/guests/party/:partyId - get guests by party id
+    //* GET - /api/workshop/guests/party/:partyId - get guests by party id
     const guestsRes = await fetch(`${GUESTS_API_URL}/party/${id}`);
-      //! ---- API Block Test
-      if (guestsRes.ok) {
-          console.log("guestsRes Function: SUCCESS");
-        } else {
-          console.log("guestsRes Function: NOT-SUCCESSFUL");
-        }
-    const guests = await guestsRes.json();
+    //! ---- API Block Test
+    // if guestRes.ok ? console.log('guestsRes Function: SUCCESS') : console.log('guestsRes Function: NOT-SUCCESSFUL');
+    if (guestsRes.ok) {
+      console.log("guestsRes Function: SUCCESS");
+    } else {
+      console.log("guestsRes Function: NOT-SUCCESSFUL");
+    }
+    const guestRes = await guestsRes.json();
 
-    // GET - /api/workshop/rsvps/party/:partyId - get RSVPs by partyId
+    //* GET - /api/workshop/rsvps/party/:partyId - get RSVPs by partyId
     const rsvpsRes = await fetch(`${RSVPS_API_URL}/party/${id}`);
-      //! ---- API Block Test
-      if (rsvpsRes.ok) {
-          console.log("rsvpsRes Function: SUCCESS");
-        } else {
-          console.log("rsvpsRes Function: NOT-SUCCESSFUL");
-        }
-    const rsvps = await rsvpsRes.json();
-
-    // GET - get all gifts by party id - /api/workshop/parties/gifts/:partyId -BUGGY?
+    //! ---- API Block Test
+    if (rsvpsRes.ok) {
+      console.log("rsvpsRes Function: SUCCESS");
+    } else {
+      console.log("rsvpsRes Function: NOT-SUCCESSFUL");
+    }
+    const rsvpsResjson = await rsvpsRes.json();
+    //* GET - get all gifts by party id - /api/workshop/parties/gifts/:partyId -BUGGY?
     // const giftsResponse = await fetch(`${PARTIES_API_URL}/party/gifts/${id}`);
     // const gifts = await giftsResponse.json();
 
-    // create new HTML element to display party details
+    //* create new HTML element to display party details
     const partyDetailsElement = document.createElement("div");
     partyDetailsElement.classList.add("party-details");
     partyDetailsElement.innerHTML = `
-            <h2>${party.title}</h2>
-            <p>${party.event}</p>
-            <p>${party.city}</p>
-            <p>${party.state}</p>
-            <p>${party.country}</p>
+            <h2>${party.name}</h2>
+            <p>${party.description}</p>
+            <p>${party.location}</p>
+            <p>${party.date}</p>
+            <p>${party.time}</p>
             <h3>Guests:</h3>
             <ul>
-            ${guests
+            ${guestRes
               .map(
                 (guest, index) => `
                   <li>
-                    <div>${guest.name}</div>
-                    <div>${rsvps[index].status}</div>
+                    ${guest.name} - ${rsvpsResjson[index].status}
                   </li>
-                `
-              )
+                `)
               .join("")}
-          </ul>
-          
-
-
+            </ul>
             <button class="close-button">Close</button>
     `;
     partyContainer.appendChild(partyDetailsElement);
@@ -133,9 +130,9 @@ const renderSinglePartyById = async (id) => {
     const closeButton = partyDetailsElement.querySelector(".close-button");
     closeButton.addEventListener("click", () => {
       partyDetailsElement.remove();
+      renderParties(partiesList);
     });
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
   }
 };
@@ -161,19 +158,17 @@ const renderParties = async (parties) => {
       // see details
       const detailsButton = partyElement.querySelector(".details-button");
       detailsButton.addEventListener("click", async (event) => {
-        //TODO ------------------------------------------------------------------------------------------//
         renderSinglePartyById(party.id);
       });
 
       // delete party
       const deleteButton = partyElement.querySelector(".delete-button");
       deleteButton.addEventListener("click", async (event) => {
-        //TODO ------------------------------------------------------------------------------------------//
         deleteParty(party.id);
+        init();
       });
     });
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
   }
 };
@@ -181,7 +176,7 @@ const renderParties = async (parties) => {
 // init function
 const init = async () => {
   //*Rendering All Parties To Web Page:
-  const partiesList = await getAllParties();
+  partiesList = await getAllParties();
   renderParties(partiesList);
 };
 
