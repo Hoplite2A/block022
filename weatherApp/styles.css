@@ -1,0 +1,50 @@
+body {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+#weather-summary {
+  border: 1px solid gray;
+  height: 60vh;
+  width: 30%;
+  margin: 0 auto;
+  border-radius: 20px;
+}
+
+#input-container {
+  height: 10vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#city-input {
+  width: 75%;
+  margin: 0 auto;
+  padding: 4px 2%;
+  font-size: 16px;
+}
+
+#get-weather {
+  width: 35%;
+  margin: 0 auto;
+  color: blue;
+  background-color: white;
+  border: 1px solid blue;
+  border-radius: 2px;
+  margin-top: 10px;
+  padding: 3px 0;
+}
+
+.forecast-container {
+  height: 30vh;
+}
+
+.current-conditions {
+  height: 10vh;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+h1 {
+  font-size: 24px;
+}

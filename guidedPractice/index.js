@@ -6,11 +6,12 @@ const baseURL = "https://fsa-async-await.herokuapp.com";
 const allSongs = "/api/guided-practice/songs";
 const createANewSong = "/api/guided-practice/songs";
 const divSongContainer = document.getElementById("song-container");
+const divNewSongContainer = document.getElementById("new-song-container");
 const songToAdd = {
-  artist_id: 1,
-  genre_id: 1776,
-  release_date: "1776-07-04T00:00:00.000Z",
-  title: "Let Freedom Reign",
+    title: "Let Freedom Reign",
+    release_date: "1776-07-04T00:00:00.000Z",
+    genre_id: 1776,
+    artist_id: 1,
 };
 
 //? Step 2 Cont'd
@@ -23,6 +24,8 @@ async function init() {
   //? 6. Call the `renderSongs` function inside your `init` function and pass in the array
   //? of songs you got from the server.
   renderAllSongs(songData);
+    
+    await addNewSong(songToAdd);
 }
 
 //? 3. Write a function called `fetchAllSongs` that will fetch all songs from the server
@@ -32,7 +35,8 @@ async function fetchAllSongs() {
     const res = await fetch(`${baseURL}${allSongs}`);
     const jsonAllSongs = res.json();
     return jsonAllSongs;
-  } catch (error) {
+  }
+  catch (error) {
     console.log(error);
   }
 }
@@ -60,10 +64,32 @@ async function addNewSong(newSongData) {
     });
     const jsonNewSong = await res.json();
     return jsonNewSong;
-  } catch (error) {
+  }
+  catch (error) {
     console.log(error);
   }
-}
-await addNewSong(songToAdd);
+};
+
+//? 8. Write a new function called `renderNewSongForm` that will render a form to the
+//? DOM.The form should have inputs for the following fields: title, artist, genre, and
+//? release date.The form should also have a submit button.
+function renderNewSongForm() {
+    const divNewSongContainerHTML = divNewSongContainer; 
+    divNewSongContainerHTML.innerHTML = `
+    <form>
+        <label for="newSongTitle">Title:</label>
+            <input id="newSongTitle" name="newSongTitle" type="text">
+        <label for="newSongArtist">Artist:</label>
+            <input id="newSongArtist" name="newSongArtist" type="text">
+        <label for="newSongGenre">Genre:</label>
+            <input id="newSongGenre" name="newSongGenre" type="number">
+        <label for="newSongReleaseDate">Release Date: </label>
+            <input id="newSongReleaseDate" name="newSongReleaseDate" type="datetime">
+        <button type="submit">Submit</button>
+    </form>
+    `
+};
+
+renderNewSongForm();
 
 init();
